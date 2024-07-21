@@ -1,15 +1,48 @@
 class Graph {
   constructor(paths) {
+    this.graph = {};
 
+    this.toGraph(paths);
+  }
+
+  toGraph(paths) {
+    const graph = {};
+
+    function addToSet(arr, idx) {
+      if(idx>0) 
+        graph[arr[idx]].add(arr[idx-1]);
+      if(idx<arr.length-1) 
+        graph[arr[idx]].add(arr[idx+1]);
+    }
+
+    paths.forEach(arr => {
+      for (let i=0; i<arr.length; i++) {
+        if (graph[arr[i]]) {
+          addToSet(arr, i);
+        }
+        else {
+          graph[arr[i]] = new Set();
+          addToSet(arr, i);
+        }
+      }
+    })
+    this.graph = graph;
   }
 
   isAdjacent(vertexA, vertexB) {
-
+    return this.graph[vertexA].has(vertexB);
   }
 
   // array is an adjacency list
   addVertex(vertex, array) {
-
+    this.graph[vertex] = new Set();
+    array.forEach(elem => {
+      if (this.graph[elem])
+        this.graph[elem].add(vertex);
+      else
+        this.graph[elem] = new Set(vertex);
+      this.graph[vertex].add(elem);
+    })
   }
 }
 
@@ -43,7 +76,7 @@ if (require.main === module) {
   console.log('Expecting: { a: { "b", "e" }, b: { "a", "c", "d" }, c: { "b" }, d: { "b", "e" }, e: { "a", "d" } }');
   console.log(graph.graph);
 
-  console.log("")
+  console.log("");
 }
 
 module.exports = Graph;
